@@ -510,7 +510,6 @@ configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
 
 set(PICOLIBC_COMPILE_OPTIONS
   "-include" "${PICOLIBC_INCLUDE}/picolibc.h"
-  "-nostdlib"
   "-D_LIBC"
   ${TLSMODEL}
   ${TARGET_COMPILE_OPTIONS}
@@ -539,7 +538,6 @@ picolibc_supported_compile_options(
   "-Warray-bounds"
   "-Wold-style-definition"
   "-frounding-math"
-  "-fsignaling-nans"
   )
 
 add_library(c STATIC)
