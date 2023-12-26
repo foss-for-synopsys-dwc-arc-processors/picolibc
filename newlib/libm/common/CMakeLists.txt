@@ -140,6 +140,9 @@ picolibc_sources(
   math_errf_invalidf.c
   math_errf_check_oflowf.c
   math_errf_check_uflowf.c
+  math_denorml.c
+  math_denorm.c
+  math_denormf.c
 )
 
 if(_HAVE_LONG_DOUBLE)
