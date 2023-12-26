@@ -35,4 +35,7 @@
 
 #include <errno.h>
 
+#if defined (__CCAC__)
+#pragma weak errno
+#endif
 NEWLIB_THREAD_LOCAL_ERRNO int errno;

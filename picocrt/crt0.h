@@ -42,8 +42,15 @@ extern char __data_source[];
 extern char __data_start[];
 extern char __data_end[];
 extern char __data_size[];
-extern char __bss_start[];
-extern char __bss_end[];
+#if defined (__CCAC__)
+    #define SMALL_DATA_BSS_START    _fsbss
+    #define SMALL_DATA_BSS_END      _esbss
+#else
+    #define SMALL_DATA_BSS_START    __bss_start
+    #define SMALL_DATA_BSS_END      __bss_end
+#endif
+extern char SMALL_DATA_BSS_START[];
+extern char SMALL_DATA_BSS_END[];
 extern char __bss_size[];
 extern char __tls_base[];
 extern char __tdata_end[];
@@ -51,7 +58,7 @@ extern char __tls_end[];
 
 #ifdef __PICOLIBC_CRT_RUNTIME_SIZE
 #define __data_size (__data_end - __data_start)
-#define __bss_size (__bss_end - __bss_start)
+#define __bss_size (SMALL_DATA_BSS_END - SMALL_DATA_BSS_START)
 #endif
 
 /* These two functions must be defined in the architecture-specific
@@ -92,7 +99,7 @@ static inline void
 __start(void)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
-	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+	memset(SMALL_DATA_BSS_START, '\0', (uintptr_t) __bss_size);
 #ifdef PICOLIBC_TLS
 	_set_tls(__tls_base);
 #endif

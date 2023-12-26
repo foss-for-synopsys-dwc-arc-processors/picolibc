@@ -36,20 +36,28 @@
 #include <unistd.h>
 #include <errno.h>
 
-extern char __heap_start[];
-extern char __heap_end[];
+#if defined (__CCAC__)
+    #define HEAP_START  _fheap
+    #define HEAP_END    _eheap
+#else
+    #define HEAP_START  __heap_start
+    #define HEAP_END    __heap_end
+#endif
 
-static char *brk = __heap_start;
+extern char HEAP_START[];
+extern char HEAP_END[];
+
+static char *brk = HEAP_START;
 
 void *sbrk(ptrdiff_t incr)
 {
 	if (incr < 0) {
-                if ((size_t) (brk - __heap_start) < (size_t) (-incr)) {
+                if ((size_t) (brk - HEAP_START) < (size_t) (-incr)) {
                     errno = ENOMEM;
                     return (void *) -1;
             }
 	} else {
-                if ((size_t) (__heap_end - brk) < (size_t) incr) {
+                if ((size_t) (HEAP_END - brk) < (size_t) incr) {
                         errno = ENOMEM;
 			return (void *) -1;
                 }
