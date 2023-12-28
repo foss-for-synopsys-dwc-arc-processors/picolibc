@@ -336,8 +336,9 @@ set(_ICONV_TO_ENCODING_WIN_1256 1)
 set(_ICONV_TO_ENCODING_WIN_1257 1)
 set(_ICONV_TO_ENCODING_WIN_1258 1)
 
-# math library does not set errno (offering only ieee semantics)
-set(_IEEE_LIBM 1)
+# math library sets errno
+set(_IEEE_LIBM 0)
+set(_WANT_MATH_ERRNO 1)
 
 if(NOT DEFINED _IO_FLOAT_EXACT)
   option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" 1)
@@ -421,9 +422,6 @@ endif()
 if(NOT DEFINED FORMAT_DEFAULT_INTEGER)
   set(FORMAT_DEFAULT_INTEGER NOT ${__IO_FLOAT})
 endif()
-
-# math library sets errno
-set(_WANT_MATH_ERRNO 0)
 
 set(_WANT_REENT_SMALL 0)
 
