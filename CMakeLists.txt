@@ -559,6 +559,21 @@ install(TARGETS c
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include)
 
+option(PICOCRT "Enable picocrt" OFF)
+if(PICOCRT)
+
+  add_subdirectory(semihost)
+  add_subdirectory(picocrt)
+
+  install(TARGETS semihost
+    LIBRARY DESTINATION lib
+    PUBLIC_HEADER DESTINATION include)
+
+  install(TARGETS picocrt picocrt-semihost
+    OBJECTS DESTINATION lib)
+
+endif()
+
 option(TESTS "Enable tests" OFF)
 if(TESTS)
 
