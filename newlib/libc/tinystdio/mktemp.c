@@ -98,8 +98,12 @@ _gettemp (char *path,
           int *doopen,
           int flags)
 {
-  char *start, *trv;
+  char *trv;
   char *end;
+  static char inc = 0;
+  static char pos = 1;
+
+  __LIBC_LOCK();
 
   end = path + strlen(path) - suffixlen;
   trv = end;
@@ -112,13 +116,35 @@ _gettemp (char *path,
   if (end - trv < 6)
     {
       errno = EINVAL;
+      __LIBC_UNLOCK();
       return 0;
     }
 
-  start = trv + 1;
+  trv += pos;
 
   for (;;)
     {
+      /* Increment the string of letters to generate another name */
+      for(;;)
+      {
+        if (trv == end)
+        {
+          __LIBC_UNLOCK();
+          return 0;
+        }
+        
+        if ((*trv + inc - 1) == 'z') {
+          *trv++ = 'a';
+          pos++;
+          inc = 1;
+        }
+        else {
+          *trv += inc;
+          inc++;
+          break;
+        }
+      }
+
       /*
        * Use open to check if the file exists to avoid depending on
        * stat or access. Don't rely on O_EXCL working, although if it
@@ -128,39 +154,33 @@ _gettemp (char *path,
       if (fd < 0) {
         if (errno != EACCES) {
           if (errno != ENOENT)
+          {
+            __LIBC_UNLOCK();
             return 0;
+          }
           if (doopen)
           {
             fd = open (path, flags | O_CREAT | O_EXCL | O_RDWR,
                        0600);
             if (fd >= 0) {
               *doopen = fd;
+              __LIBC_UNLOCK();
               return 1;
             }
             if (errno != EEXIST)
+            {
+              __LIBC_UNLOCK();
               return 0;
+            }
           } else {
+            __LIBC_UNLOCK();
             return 1;
           }
         }
       } else
         close(fd);
-
-      /* Increment the string of letters to generate another name */
-      trv = start;
-      for(;;)
-	{
-	  if (trv == end)
-	    return 0;
-	  if (*trv == 'z')
-	    *trv++ = 'a';
-	  else {
-            ++ * trv;
-            break;
-          }
-	}
     }
-  /*NOTREACHED*/
+    __LIBC_UNLOCK();
 }
 
 int
