@@ -414,7 +414,7 @@ foreach target : targets
     endif
 
     test_gets = executable(t1_name, t1_src,
-		           c_args: _c_args + ['-D_FORTIFY_SOURCE=2'],
+		           c_args: _c_args,
 		           link_args: _link_args,
 		           objects: _objs,
 		           link_with: _libs,
@@ -544,6 +544,7 @@ foreach target : targets
                       'test-ungetc-ftell',
                       'test-fgetc',
                       'test-fgets-eof',
+                      'test-wchar',
                      ]
     endif
   endif
@@ -643,6 +644,12 @@ if enable_native_tests
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
+    test('test-wchar_native',
+    executable('test-wchar_native',
+        'test-wchar.c',
+        c_args: native_c_args,
+        link_args: native_c_args,
+        dependencies: native_lib_m))
 
     test('fenv-native',
          executable('fenv-native',
