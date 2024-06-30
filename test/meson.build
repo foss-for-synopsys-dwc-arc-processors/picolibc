@@ -414,7 +414,7 @@ foreach target : targets
     endif
 
     test_gets = executable(t1_name, t1_src,
-		           c_args: _c_args + ['-D_FORTIFY_SOURCE=2'],
+		           c_args: _c_args,
 		           link_args: _link_args,
 		           objects: _objs,
 		           link_with: _libs,
@@ -510,7 +510,7 @@ foreach target : targets
 		 'math-funcs', 'timegm', 'time-tests',
                  'test-strtod', 'test-strchr',
 		 'test-memset', 'test-put',
-		 'test-efcvt', 'test-atomic',
+		 'test-efcvt',
 		 'test-raise',
                  'test-fma',
                  'test-funopen',
@@ -532,6 +532,10 @@ foreach target : targets
     plain_tests += 't_fmemopen'
   endif
 
+  if atomic_ungetc or atomic_signal
+    plain_tests += 'test-atomic'
+  endif
+
   if (posix_io or not tinystdio) and tests_enable_posix_io
     plain_tests += ['posix-io']
 
@@ -544,6 +548,7 @@ foreach target : targets
                       'test-ungetc-ftell',
                       'test-fgetc',
                       'test-fgets-eof',
+                      'test-wchar',
                      ]
     endif
   endif
@@ -643,6 +648,12 @@ if enable_native_tests
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
+    test('test-wchar_native',
+    executable('test-wchar_native',
+        'test-wchar.c',
+        c_args: native_c_args,
+        link_args: native_c_args,
+        dependencies: native_lib_m))
 
     test('fenv-native',
          executable('fenv-native',

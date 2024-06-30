@@ -300,14 +300,14 @@ int	ferror(FILE *__stream);
 #endif
 
 __extension__ typedef _fpos_t fpos_t;
-int fgetpos(FILE *stream, fpos_t *pos);
+int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
 FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
 FILE *freopen(const char *path, const char *mode, FILE *stream);
 FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
 FILE *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
 int fseek(FILE *stream, long offset, int whence);
 int fseeko(FILE *stream, __off_t offset, int whence);
-int fsetpos(FILE *stream, fpos_t *pos);
+int fsetpos(FILE *stream, const fpos_t *pos);
 long ftell(FILE *stream);
 __off_t ftello(FILE *stream);
 int fileno(FILE *);
@@ -335,6 +335,21 @@ FILE	*funopen (const void *cookie,
 # define	fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
 # define	fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
+
+#if __POSIX_VISIBLE >= 199309L
+int	getc_unlocked (FILE *);
+int	getchar_unlocked (void);
+void	flockfile (FILE *);
+int	ftrylockfile (FILE *);
+void	funlockfile (FILE *);
+int	putc_unlocked (int, FILE *);
+int	putchar_unlocked (int);
+#define getc_unlocked(f) fgetc(f)
+#define getchar_unlocked(f) fgetc(stdin)
+#define putc_unlocked(c, f) fputc(c, f)
+#define putchar_unlocked(c, f) fgetc(c, stdin)
+#endif
+
 /*
  * The format of tmpnam names is TXXXXXX, which works with mktemp
  */

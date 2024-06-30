@@ -184,7 +184,7 @@ newlib_nano_malloc = get_option('newlib-nano-malloc')
 lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
-c_args = ['-include', '@0@/@1@'.format(meson.current_build_dir(), 'picolibc.h')] + core_c_args
+c_args = core_c_args
 native_common_args = ['-DNO_NEWLIB']
 
 if get_option('profile')
@@ -198,7 +198,7 @@ endif
 if have_cplusplus
   cpp_args = c_args
   cpp_flags = cpp.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
-				           '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
+				           '-Wno-unsupported-floating-point-opt',
 				           '-fno-builtin-copysignl'])
   cpp_args += cpp_flags
   native_cpp_args = native_common_args + cpp_flags
@@ -207,7 +207,7 @@ endif
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
 c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
-				      '-Wno-unsupported-floating-point-opt', '-fno-stack-protector',
+				      '-Wno-unsupported-floating-point-opt',
 				      '-fno-builtin-copysignl'])
 
 c_sanitize_bounds_flags = cc.get_supported_arguments(['-fsanitize=bounds'])
@@ -297,6 +297,7 @@ posix_console = tinystdio and get_option('posix-console')
 posix_io = tinystdio and (get_option('posix-io') or posix_console)
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
+atomic_signal = get_option('atomic-signal')
 format_default = get_option('format-default')
 printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
@@ -788,6 +789,8 @@ common_warnings = [
   '-Wno-missing-braces',
   '-Wno-return-type',
   '-Wno-unused-command-line-argument',
+  '-Wmissing-prototypes',
+  '-Wmissing-declarations',
 ]
 if get_option('analyzer')
   common_warnings += [
@@ -816,11 +819,13 @@ else
 endif
 test_c_args += [test_fortify_arg]
 
+c_args += cc.get_supported_arguments(['-fno-stack-protector'])
+
 if have_cplusplus
   cpp_warnings = common_warnings
   cpp_flags = cpp.get_supported_arguments(cpp_warnings)
   cpp_args += cpp_flags
-  cpp_flags = cpp.get_supported_arguments(['-fno-exceptions', '-fno-unwind-tables'])
+  cpp_flags = cpp.get_supported_arguments(['-fno-exceptions', '-fno-unwind-tables', '-fno-stack-protector'])
   cpp_args += cpp_flags
   test_cpp_args = cpp_args + [test_fortify_arg]
 endif
@@ -1331,7 +1336,7 @@ conf_data.set('_HAVE_PICOLIBC_TLS_RP2040', get_option('tls-rp2040'),
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('_PRINTF_SMALL_ULTOA', printf_small_ultoa, description: 'avoid software division in decimal conversion')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
-conf_data.set('_PICOLIBC_ATOMIC_SIGNAL', get_option('atomic-signal'), description: 'Use atomics for signal/raise for re-entrancy')
+conf_data.set('_PICOLIBC_ATOMIC_SIGNAL', atomic_signal, description: 'Use atomics for signal/raise for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
 conf_data.set('_HAVE_BUILTIN_ADD_OVERFLOW', have_builtin_add_overflow, description: 'Compiler has __builtin_add_overflow')
@@ -1583,6 +1588,10 @@ if tests_enable_stack_protector
   endif
 endif
 
+if not tests_enable_stack_protector
+  test_c_args += cc.get_supported_arguments(['-fno-stack-protector'])
+endif
+
 if have_long_double and get_option('test-long-double')
   test_c_args += ['-D_TEST_LONG_DOUBLE']
   native_c_args += ['-D_TEST_LONG_DOUBLE']
@@ -1647,7 +1656,7 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 ['-nostartfiles', '-T', picolibc_ld_string,
+		 ['-nostdlib', '-T', picolibc_ld_string,
 		  lib_gcc] + additional_libs_list + specs_line)
 
     set_variable(test_linker_files_variable, [picolibc_ld_value])
