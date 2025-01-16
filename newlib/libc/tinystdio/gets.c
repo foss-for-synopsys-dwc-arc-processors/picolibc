@@ -31,6 +31,8 @@
 
 #include "stdio_private.h"
 
+#if _PICOLIBC_USE_DEPRECATED_GETS
+
 char *
 gets(char *str)
 {
@@ -52,3 +54,5 @@ gets(char *str)
                 }
         }
 }
+
+#endif
