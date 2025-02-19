@@ -200,5 +200,22 @@ _start(void)
         __asm__("csrw   mtvec, t0");
         __asm__("csrr   t1, mtvec");
 #endif
+
+        /**
+         * Check misa.V (misa[21]) for V extension presence.
+         * Set mstatus.VS (mstatus[10:9]) if V extension is present.
+         */
+#ifdef __riscv_zicsr
+        __asm__("csrr   t0, misa");
+        __asm__("srli   t0, t0, 21");
+        __asm__("andi   t0, t0, 1");
+        __asm__("beqz   t0, 1f");
+        __asm__("csrr   t0, mstatus");
+        __asm__("li     t1, 1536");
+        __asm__("or     t0, t1, t0");
+        __asm__("csrw   mstatus, t0");
+        __asm__("1:");
+#endif
+
         __asm__("j      _cstart");
 }
