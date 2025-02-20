@@ -96,6 +96,12 @@ picocrt_variants = [
     'c_args': [],
     'src': src_picocrt_none,
   },
+  {
+    'name': 'arcv',
+    'suffix': '-arcv',
+    'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_ARCV'],
+    'src': src_picocrt,
+  },
 ]
 
 if has_semihost
