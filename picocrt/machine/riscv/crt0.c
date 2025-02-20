@@ -172,6 +172,27 @@ _trap(void)
 }
 #endif
 
+#if defined (CRT0_ARCV) && defined (__riscv_zicsr)
+#define CSR_NUM_ARCV_MCACHE_CTRL            0x7C8
+#define ARCV_MCACHE_CTRL_IC_EN_OFFSET       0x0
+#define ARCV_MCACHE_CTRL_DC_EN_OFFSET       0x8
+#define ARCV_MCACHE_CTRL_DC_L0_EN_OFFSET    0xC
+#define ARCV_MCACHE_CTRL_L2_EN_OFFSET       0x10
+
+static void __section(".init") __used
+_arcv_cache_enable()
+{
+        unsigned long mcache;
+        __asm__ __volatile__("csrr %0, %1" : "=r"((mcache)) : "i"((CSR_NUM_ARCV_MCACHE_CTRL)));
+        mcache |=
+                (1 << ARCV_MCACHE_CTRL_IC_EN_OFFSET) |
+                (1 << ARCV_MCACHE_CTRL_DC_EN_OFFSET) |
+                (1 << ARCV_MCACHE_CTRL_DC_L0_EN_OFFSET) |
+                (1 << ARCV_MCACHE_CTRL_L2_EN_OFFSET);
+        __asm__ __volatile__("csrw %0, %1" :: "i"(CSR_NUM_ARCV_MCACHE_CTRL), "r"(mcache));
+}
+#endif
+
 void __naked __section(".text.init.enter") __used
 _start(void)
 {
@@ -221,6 +242,10 @@ _start(void)
         __asm__("or     t0, t1, t0");
         __asm__("csrw   mstatus, t0");
         __asm__("1:");
+#endif
+
+#if defined (CRT0_ARCV) && defined (__riscv_zicsr)
+        __asm__("jal   _arcv_cache_enable");
 #endif
 
         __asm__("j      _cstart");
