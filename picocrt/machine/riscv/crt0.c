@@ -172,7 +172,7 @@ _trap(void)
 }
 #endif
 
-#if defined (CRT0_ARCV) && defined (__riscv_zicsr)
+#ifdef CRT0_ARCV
 #define CSR_NUM_ARCV_MCACHE_CTRL            0x7C8
 #define ARCV_MCACHE_CTRL_IC_EN_OFFSET       0x0
 #define ARCV_MCACHE_CTRL_DC_EN_OFFSET       0x8
@@ -232,7 +232,6 @@ _start(void)
          * Check misa.V (misa[21]) for V extension presence.
          * Set mstatus.VS (mstatus[10:9]) if V extension is present.
          */
-#ifdef __riscv_zicsr
         __asm__("csrr   t0, misa");
         __asm__("srli   t0, t0, 21");
         __asm__("andi   t0, t0, 1");
@@ -242,9 +241,8 @@ _start(void)
         __asm__("or     t0, t1, t0");
         __asm__("csrw   mstatus, t0");
         __asm__("1:");
-#endif
 
-#if defined (CRT0_ARCV) && defined (__riscv_zicsr)
+#if defined (CRT0_ARCV)
         __asm__("jal   _arcv_cache_enable");
 #endif
 
