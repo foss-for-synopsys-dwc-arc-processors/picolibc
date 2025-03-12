@@ -232,7 +232,7 @@ _start(void)
         __asm__("andi   t0, t0, 1");
         __asm__("beqz   t0, 1f");
         __asm__("csrr   t0, mstatus");
-        __asm__("li     t1, 1536");
+        __asm__("li     t1, 512");
         __asm__("or     t0, t1, t0");
         __asm__("csrw   mstatus, t0");
         __asm__("1:");
