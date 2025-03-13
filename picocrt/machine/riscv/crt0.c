@@ -42,7 +42,7 @@ _cstart(void)
 	__start();
 }
 
-#ifdef CRT0_SEMIHOST
+#if defined(CRT0_SEMIHOST) && !defined(CRT0_NO_CSR)
 #include <semihost.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -166,7 +166,7 @@ _trap(void)
 }
 #endif
 
-#ifdef CRT0_ARCV
+#if defined(CRT0_ARCV) && !defined(CRT0_NO_CSR)
 #define CSR_NUM_ARCV_MCACHE_CTRL            0x7C8
 #define ARCV_MCACHE_CTRL_IC_EN_OFFSET       0x0
 #define ARCV_MCACHE_CTRL_DC_EN_OFFSET       0x8
@@ -216,12 +216,13 @@ _start(void)
                 "csrw	mstatus, t0\n"
                 "csrwi	fcsr, 0");
 #endif
-#ifdef CRT0_SEMIHOST
+#if CRT0_SEMIHOST && !defined(CRT0_NO_CSR)
         __asm__("la     t0, _trap");
         __asm__("csrw   mtvec, t0");
         __asm__("csrr   t1, mtvec");
 #endif
 
+#ifndef CRT0_NO_CSR
         /**
          * Check misa.V (misa[21]) for V extension presence.
          * Set mstatus.VS (mstatus[10:9]) if V extension is present.
@@ -235,8 +236,9 @@ _start(void)
         __asm__("or     t0, t1, t0");
         __asm__("csrw   mstatus, t0");
         __asm__("1:");
+#endif
 
-#if defined (CRT0_ARCV)
+#if defined (CRT0_ARCV) && !defined(CRT0_NO_CSR)
         __asm__("jal   _arcv_cache_enable");
 #endif
 
