@@ -96,10 +96,44 @@ picocrt_variants = [
     'c_args': [],
     'src': src_picocrt_none,
   },
+]
+
+# crt0 variants for ARC-V targets
+picocrt_variants += [
   {
     'name': 'arcv',
     'suffix': '-arcv',
-    'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_ARCV'],
+    'c_args': ['-DCRT0_ARCV'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'arcv-no-csr',
+    'suffix': '-arcv-no-csr',
+    'c_args': ['-DCRT0_ARCV', '-DCRT0_NO_CSR'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'arcv-hosted',
+    'suffix': '-arcv-hosted',
+    'c_args': ['-DCRT0_ARCV', '-DCRT0_EXIT'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'arcv-hosted-no-csr',
+    'suffix': '-arcv-hosted-no-csr',
+    'c_args': ['-DCRT0_ARCV', '-DCRT0_NO_CSR', '-DCRT0_EXIT'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'arcv-minimal',
+    'suffix': '-arcv-minimal',
+    'c_args': ['-DCRT0_ARCV', '-DCONSTRUCTORS=0'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'arcv-minimal-no-csr',
+    'suffix': '-arcv-minimal-no-csr',
+    'c_args': ['-DCRT0_ARCV', '-DCRT0_NO_CSR', '-DCONSTRUCTORS=0'],
     'src': src_picocrt,
   },
 ]
@@ -111,6 +145,23 @@ if has_semihost
                        'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
                        'src': src_picocrt,
                      }
+
+  # crt0 variants for ARC-V targets with semihosting
+  picocrt_variants += [
+    {
+      'name': 'arcv-semihost',
+      'suffix': '-arcv-semihost',
+      'c_args': ['-DCRT0_ARCV', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+      'src': src_picocrt,
+    },
+    {
+      'name': 'arcv-semihost-no-csr',
+      'suffix': '-arcv-semihost-no-csr',
+      'c_args': ['-DCRT0_ARCV', '-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_NO_CSR'],
+      'src': src_picocrt,
+    },
+  ]
+
   crt0_test = 'crt0_semihost'
 endif
 
