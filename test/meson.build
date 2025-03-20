@@ -739,3 +739,7 @@ subdir('libc-testsuite')
 if has_arm_semihost
   subdir('semihost')
 endif
+
+if host_cpu_family == 'riscv'
+  subdir('riscv')
+endif
