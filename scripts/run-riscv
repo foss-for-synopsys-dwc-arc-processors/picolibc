@@ -75,6 +75,7 @@ test "${archstring#*_a}" != "$archstring" && options="$options a"
 test "${archstring#*_f}" != "$archstring" && options="$options f"
 test "${archstring#*_d}" != "$archstring" && options="$options d"
 test "${archstring#*_c}" != "$archstring" && options="$options c"
+test "${archstring#*_v}" != "$archstring" && options="$options v"
 
 cpu="$cpu,mmu=false,pmp=false"
 
@@ -82,7 +83,7 @@ if [ -z "$options" ]; then
     options="$(echo "$elf" | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g')"
 fi
 
-all_options="i e g m a f d c s u"
+all_options="i e g m a f d c s u v"
 
 if $qemu --version | grep -q 'version [789]'; then
     all_options="h $all_options"
