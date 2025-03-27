@@ -94,7 +94,8 @@ _ctrap(struct fault *fault)
 #define _PASTE(r) #r
 #define PASTE(r) _PASTE(r)
 
-void __attribute__((naked)) __section(".init") __attribute__((used)) __attribute((aligned(4)))
+void __attribute__((naked)) __section(".init") __attribute__((used))
+__attribute((aligned(4))) __attribute__((target("arch=+zicsr")))
 _trap(void)
 {
 #ifndef __clang__
@@ -173,7 +174,7 @@ _trap(void)
 #define ARCV_MCACHE_CTRL_DC_L0_EN_OFFSET    0xC
 #define ARCV_MCACHE_CTRL_L2_EN_OFFSET       0x10
 
-static void __attribute__((used)) __section(".init")
+static void __attribute__((used)) __section(".init") __attribute__((target("arch=+zicsr")))
 _arcv_cache_enable()
 {
         unsigned long mcache;
@@ -187,7 +188,8 @@ _arcv_cache_enable()
 }
 #endif
 
-void __attribute__((naked)) __section(".text.init.enter") __attribute__((used))
+void __attribute__((naked)) __section(".text.init.enter")
+__attribute__((used)) __attribute__((target("arch=+zicsr")))
 _start(void)
 {
 
