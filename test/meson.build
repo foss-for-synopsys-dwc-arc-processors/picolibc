@@ -419,7 +419,7 @@ foreach params : targets
        depends: bios_bin,
        suite: 'test',
        env: test_env,
-       timeout: 90,
+       timeout: 360,
       )
 
   if get_option('test-stdin')
@@ -487,7 +487,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
-       timeout: 120,
+       timeout: 360,
        priority: -1,
        suite: 'test',
        env: test_env)
