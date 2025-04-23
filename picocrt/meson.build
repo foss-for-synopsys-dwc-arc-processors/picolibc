@@ -45,6 +45,10 @@ picocrt_machines = [
     # Suffix used on file names, QEMU's is empty because it is the default.
     'suffix': '',
   },
+  {
+    'name': 'nsim',
+    'suffix': '-nsim',
+  }
 ]
 
 machine_dir = 'machine' / host_cpu_family
