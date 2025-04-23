@@ -45,6 +45,10 @@ picocrt_machines = [
     # Suffix used on file names, QEMU's is empty because it is the default.
     'suffix': '',
   },
+  {
+    'name': 'nsim',
+    'suffix': '_nsim',
+  }
 ]
 
 machine_dir = 'machine' / host_cpu_family
@@ -162,7 +166,11 @@ if has_semihost
     },
   ]
 
-  crt0_test = 'crt0_semihost'
+  if test_machine == 'nsim'
+    crt0_test = 'crt0_arcv_semihost'
+  else
+    crt0_test = 'crt0_semihost'
+  endif
 endif
 
 foreach params : targets

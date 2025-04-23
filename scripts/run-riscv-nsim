@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+
+# Copyright (c) 2025, Synopsys, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1) Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2) Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3) Neither the name of the Synopsys, Inc., nor the names of its contributors
+# may be used to endorse or promote products derived from this software
+# without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+import argparse
+import logging
+import re
+import shutil
+import subprocess
+import sys
+
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.ERROR)
+
+NSIM_EXT_ALLOWED = [
+    "i",
+    "m",
+    "a",
+    "f",
+    "d",
+    "c",
+    "e",
+    "h",
+    "v",
+    "zfh",
+    "zfhmin",
+    "zhinx",
+    "zhinxmin",
+    "zfinx",
+    "zdinx",
+    "zfa",
+    "zicsr",
+    "zifencei",
+    "zicond",
+    "zihintpause",
+    "zba",
+    "zbb",
+    "zbc",
+    "zbs",
+    "zca",
+    "zcb",
+    "zcf",
+    "zcd",
+    "zcmp",
+    "zcmt",
+    "zicbom",
+    "zicboz",
+    "zicbop",
+    "zvl32b",
+    "zvl64b",
+    "zvl128b",
+    "zvl256b",
+    "zvl512b",
+    "zvl1024b",
+    "zve32x",
+    "zve32f",
+    "zve64x",
+    "zve64f",
+    "zve64d",
+]
+
+
+def main():
+    parser = argparse.ArgumentParser(prog="run-riscv-nsim", description="Execute a RISC-V binary in nSIM.")
+    parser.add_argument("--debug", action=argparse.BooleanOptionalAction, help="Enable debugging messages")
+    parser.add_argument("binary", help="A binary file to execute in nSIM")
+    parser.add_argument("arguments", nargs="*", help="Command line arguments for an application")
+    args = parser.parse_args()
+
+    if args.debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    if shutil.which("readelf") is None:
+        logging.error("readelf is not found in PATH")
+        return 1
+
+    # Get readelf version. Output format differs for LLVM and GNU.
+    readelf_version = subprocess.check_output(["readelf", "--version"], stderr=subprocess.STDOUT).decode()
+    logging.debug("readelf --version: %s", readelf_version.splitlines()[0])
+
+    logging.debug("trying to open %s", args.binary)
+    readelf_arch_specific = subprocess.check_output(
+        ["readelf", "--arch-specific", args.binary], stderr=subprocess.STDOUT
+    ).decode()
+
+    # Get RISC-V arch string from readelf output
+    readelf_arch_string = ""
+    for line in readelf_arch_specific.splitlines():
+        line = line.strip()
+        if "LLVM" in readelf_version:
+            if line.startswith("Value: rv"):
+                readelf_arch_string = line.split()[1].strip()
+                break
+        else:
+            # For GNU we need to remove surrounding quotes
+            if line.startswith("Tag_RISCV_arch"):
+                readelf_arch_string = line.split()[1].strip()[1:-1]
+                break
+
+    if readelf_arch_string == "":
+        logging.error("cannot find arch string in headers")
+        return 1
+
+    logging.debug("found arch string in headers: %s", readelf_arch_string)
+
+    isa_family = isa_family_from_arch_string(readelf_arch_string)
+    logging.debug("parsed ISA family: %s", isa_family)
+    extensions = extensions_from_arch_string(readelf_arch_string)
+    logging.debug("parsed extensions: %s", str(extensions))
+    extensions = list(filter(lambda ext: ext in NSIM_EXT_ALLOWED, extensions))
+    logging.debug("filtered extensions for nSIM: %s", str(extensions))
+
+    # Prepare command line for running nSIM. Note that we use enable_exceptions=1
+    # since some Picolibc tests use hardware exceptions.
+    nsim_isa_ext = "-all." + ".".join(extensions)
+    subprocess_arguments = [
+        "nsimdrv",
+        "-p",
+        "nsim_isa_family=" + isa_family,
+        "-p",
+        "nsim_isa_ext=" + nsim_isa_ext,
+        "-p",
+        "nsim_semihosting=1",
+        "-p",
+        "enable_exceptions=1",
+        "{}".format(args.binary),
+        *args.arguments,
+    ]
+    logging.debug("nSIM command line: %s", " ".join(subprocess_arguments))
+
+    exit_code = 0
+
+    try:
+        exit_code = subprocess.call(subprocess_arguments)
+    except FileNotFoundError:
+        logging.error("cannot find nsimdrv binary")
+        exit_code = 1
+
+    return exit_code
+
+
+def isa_family_from_arch_string(arch_string):
+    family = arch_string.split("_")[0]
+
+    # Get rv32 or rv64 from arch string
+    family = re.match(r"(rv\d+)", family).group(1)
+
+    return family
+
+
+def extensions_from_arch_string(arch_string):
+    family, *versioned_extensions = arch_string.split("_")
+
+    # Remove a version part of RISC-V family and get a base extension (i or e)
+    extensions = [re.sub(r"\d+p\d+$", "", family)[-1]]
+
+    # Remove a version part of extensions
+    for extension in versioned_extensions:
+        extensions.append(re.sub(r"\d+p\d+$", "", extension))
+
+    # By default, all tests are expected to use Zicsr
+    if "zicsr" not in extensions:
+        extensions.append("zicsr")
+
+    return extensions
+
+
+if __name__ == "__main__":
+    sys.exit(main())
