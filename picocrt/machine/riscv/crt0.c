@@ -173,7 +173,7 @@ _trap(void)
 }
 #endif
 
-#if defined(CRT0_ARCV) && !defined(CRT0_NO_CSR)
+#if defined(CRT0_ARCV)
 #define CSR_NUM_MSTATUS                     0x300
 #define MSTATUS_VS_OFFSET                   0x9
 #define MSTATUS_VS_MASK                     0x3
@@ -265,7 +265,7 @@ _start(void)
         __asm__("csrr   t1, mtvec");
 #endif
 
-#if defined (CRT0_ARCV) && !defined(CRT0_NO_CSR)
+#if defined (CRT0_ARCV)
         __asm__("jal   _arcv_cache_enable");
         __asm__("jal   _arcv_vector_enable");
 #endif
