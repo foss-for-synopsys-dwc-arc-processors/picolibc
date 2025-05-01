@@ -125,12 +125,20 @@ picocrt_variants += [
 ]
 
 if has_semihost
-  picocrt_variants += {
-                       'name': 'semihost',
-                       'suffix': '-semihost',
-                       'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-                       'src': src_picocrt,
-                     }
+  picocrt_variants = [
+    {
+      'name': 'semihost',
+      'suffix': '-semihost',
+      'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+      'src': src_picocrt,
+    },
+    {
+      'name': 'semihost-trap',
+      'suffix': '-semihost-trap',
+      'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
+      'src': src_picocrt,
+    },
+  ]
 
   # crt0 variants for ARC-V targets with semihosting
   picocrt_variants += [
@@ -140,12 +148,18 @@ if has_semihost
       'c_args': ['-DCRT0_ARCV', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
       'src': src_picocrt,
     },
+    {
+      'name': 'arcv-semihost-trap',
+      'suffix': '-arcv-semihost-trap',
+      'c_args':  ['-DCRT0_ARCV', '-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
+      'src': src_picocrt,
+    },
   ]
 
   if test_machine == 'nsim'
-    crt0_test = 'crt0_arcv_semihost'
+    crt0_test = 'crt0_arcv_semihost_trap'
   else
-    crt0_test = 'crt0_semihost'
+    crt0_test = 'crt0_semihost_trap'
   endif
 endif
 

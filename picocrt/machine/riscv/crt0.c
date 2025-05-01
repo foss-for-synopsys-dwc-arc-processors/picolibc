@@ -42,7 +42,7 @@ _cstart(void)
 	__start();
 }
 
-#if defined(CRT0_SEMIHOST) && !defined(CRT0_NO_CSR)
+#if defined(CRT0_SEMIHOST_TRAP)
 #include <semihost.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -259,7 +259,7 @@ _start(void)
                 "csrw	mstatus, t0\n"
                 "csrwi	fcsr, 0");
 #endif
-#if CRT0_SEMIHOST && !defined(CRT0_NO_CSR)
+#if defined(CRT0_SEMIHOST_TRAP)
         __asm__("la     t0, _trap");
         __asm__("csrw   mtvec, t0");
         __asm__("csrr   t1, mtvec");
