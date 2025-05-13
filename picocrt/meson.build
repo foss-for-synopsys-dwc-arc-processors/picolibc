@@ -125,7 +125,7 @@ picocrt_variants += [
 ]
 
 if has_semihost
-  picocrt_variants = [
+  picocrt_variants += [
     {
       'name': 'semihost',
       'suffix': '-semihost',
