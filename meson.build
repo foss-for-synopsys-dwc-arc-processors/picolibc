@@ -1187,6 +1187,13 @@ foreach params : [default_target] + targets
                                   configuration: picolibc_ld_data,
                                   install: picolibc_ld_install,
                                   install_dir: lib_dir))
+      if target == 'default-target'
+        configure_file(input: 'picolibc_perf.ld.in',
+                       output: 'picolibc_perf.ld',
+                       configuration: picolibc_ld_data,
+                       install: picolibc_ld_install,
+                       install_dir: lib_dir)
+      endif
     endif
 
     set_variable(picolibc_ld_variable, get_variable(picolibc_ld_config_variable))
@@ -1206,6 +1213,13 @@ foreach params : [default_target] + targets
                                 configuration: picolibcpp_ld_data,
                                 install: picolibc_ld_install,
                                 install_dir: lib_dir))
+      if target == 'default-target'
+        configure_file(input: 'picolibc_perf.ld.in',
+                       output: 'picolibcpp_perf.ld',
+                       configuration: picolibcpp_ld_data,
+                       install: picolibc_ld_install,
+                       install_dir: lib_dir)
+      endif
     endif
                    
     set_variable(picolibcpp_ld_variable, get_variable(picolibcpp_ld_config_variable))
