@@ -82,6 +82,7 @@ QUICKREF
 
 */
 
+#define _DEFAULT_SOURCE
 #include <complex.h>
 #include <math.h>
 #include "cephes_subr.h"
@@ -98,8 +99,17 @@ __weak_alias(catan, _catan)
     x = creal(z);
     y = cimag(z);
 
-    if ((x == 0.0) && (y > 1.0))
-        goto ovrf;
+    if (x == 0.0) {
+        if (y > 1.0) {
+            return CMPLX(M_PI_2, 0.5 * log((1.0 + y) / (y - 1.0)));
+        }
+        if (y < -1.0) {
+            return CMPLX(-M_PI_2, 0.5 * log((1.0 - y) / (-y - 1.0)));
+        }
+        if (fabs(y) <= 1.0) {
+            return CMPLX(0.0, atanh(y));
+        }
+    }
 
     x2 = x * x;
     a = 1.0 - x2 - (y * y);
