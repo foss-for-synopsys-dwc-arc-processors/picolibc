@@ -87,8 +87,11 @@ typedef __uint16_t __ungetc_t;
 #endif
 
 struct __file {
-    __ungetc_t unget;                  /* ungetc() buffer */
-    __uint8_t  flags;                  /* flags, see below */
+    __ungetc_t unget; /* ungetc() buffer */
+    __uint8_t  flags; /* flags, see below */
+#ifdef __IO_PERCENT_N
+    size_t buflimit; /* buffer limit size */
+#endif
 #define __SRD    0x0001                /* OK to read */
 #define __SWR    0x0002                /* OK to write */
 #define __SERR   0x0004                /* found error */

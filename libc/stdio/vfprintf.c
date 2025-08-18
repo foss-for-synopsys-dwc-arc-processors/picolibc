@@ -250,6 +250,14 @@ typedef long          ultoa_signed_t;
 #define arg_to_unsigned(ap, flags, result_var) arg_to_t(ap, flags, unsigned, result_var)
 #define arg_to_signed(ap, flags, result_var)   arg_to_t(ap, flags, signed, result_var)
 
+#define ASSIGN_STREAM_LEN(stream_len, buflimit, flags, type)                        \
+    if (flags & __SBUF) {                                                           \
+        *va_arg(ap, type *) = stream_len;                                           \
+    } else {                                                                        \
+        *va_arg(ap, type *)                                                         \
+            = ((size_t)stream_len >= buflimit) ? (type)buflimit : (type)stream_len; \
+    }
+
 #include "ultoa_invert.c"
 
 /* Order is relevant here and matches order in format string */
