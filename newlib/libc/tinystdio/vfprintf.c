@@ -245,6 +245,15 @@ typedef long ultoa_signed_t;
 #define arg_to_unsigned(ap, flags, result_var) arg_to_t(ap, flags, unsigned, result_var)
 #define arg_to_signed(ap, flags, result_var) arg_to_t(ap, flags, signed, result_var)
 
+#define ASSIGN_STREAM_LEN(stream_len, buflimit, flags, type)                   \
+    if (flags & __SBUF) {                                                      \
+        *va_arg(ap, type *) = stream_len;                                      \
+    } else {                                                                   \
+        *va_arg(ap, type *) = ((size_t)stream_len >= buflimit) ?               \
+                               (type)buflimit :                                \
+                               (type)stream_len;                               \
+    }
+
 #include "ultoa_invert.c"
 
 /* Order is relevant here and matches order in format string */
@@ -1192,17 +1201,25 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                 goto handle_error;
 #else
                 if (flags & FL_LONG) {
-                    if (flags & FL_REPD_TYPE)
-                        *va_arg(ap, long long *) = stream_len;
-                    else
-                        *va_arg(ap, long *) = stream_len;
+                    if ((flags)&FL_REPD_TYPE) {
+                        ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                                          stream->flags, long long);
+                    } else {
+                        ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                                          stream->flags, long);
+                    }
                 } else if (flags & FL_SHORT) {
-                    if (flags & FL_REPD_TYPE)
-                        *va_arg(ap, char *) = stream_len;
-                    else
-                        *va_arg(ap, short *) = stream_len;
+                    if ((flags)&FL_REPD_TYPE) {
+                        ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                                          stream->flags, char);
+                    } else {
+                        ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                                          stream->flags, short);
+                    }
                 } else {
-                    *va_arg(ap, int *) = stream_len;
+                    ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                                        stream->flags, int);
+
                 }
 #endif
 #endif
