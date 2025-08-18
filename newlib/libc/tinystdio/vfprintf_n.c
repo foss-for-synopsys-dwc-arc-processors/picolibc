@@ -36,17 +36,23 @@
 #else
 
     if (flags & FL_LONG) {
-        if (flags & FL_REPD_TYPE)
-            *va_arg(ap, long long *) = stream_len;
-        else
-            *va_arg(ap, long *) = stream_len;
+        if ((flags)&FL_REPD_TYPE) {
+            ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                              stream->flags, long long);
+        } else {
+            ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                              stream->flags, long);
+        }
     } else if (flags & FL_SHORT) {
-        if (flags & FL_REPD_TYPE)
-            *va_arg(ap, char *) = stream_len;
-        else
-            *va_arg(ap, short *) = stream_len;
+        if ((flags)&FL_REPD_TYPE) {
+            ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                              stream->flags, char);
+        } else {
+            ASSIGN_STREAM_LEN(stream_len, stream->buflimit,
+                              stream->flags, short);
+        }
     } else {
-        *va_arg(ap, int *) = stream_len;
+        ASSIGN_STREAM_LEN(stream_len, stream->buflimit, stream->flags, int);
     }
 #endif
 }
