@@ -52,6 +52,13 @@
 #include <sys/stat.h>
 #endif
 
+#ifdef __IO_PERCENT_N
+#define PRINTF_BUF_LIMIT(_s, _end)                                              \
+    .buflimit = (size_t)((_end) ? ((char *)(_end) - (char *)(_s)) : (INT_MAX)),
+#else
+#define PRINTF_BUF_LIMIT(_s, _end)
+#endif
+
 struct __file_str {
     struct __file file;  /* main file struct */
     char         *pos;   /* current buffer position */
@@ -100,11 +107,12 @@ bool              __matchcaseprefix(const char *input, const char *pattern);
 
 #define FDEV_STRING_WRITE_END(_s, _n) (((int)(_n) < 0) ? NULL : ((_n) ? (_s) + (_n) - 1 : (_s)))
 
-#define FDEV_SETUP_STRING_WRITE(_s, _end)                                    \
-    {                                                                        \
-        .file = { .flags = __SWR, .put = __file_str_put, __LOCK_INIT_NONE }, \
-        .pos = (_s),                                                         \
-        .end = (_end),                                                       \
+#define FDEV_SETUP_STRING_WRITE(_s, _end)                                                         \
+    {                                                                                             \
+        .file                                                                                     \
+        = { .flags = __SWR, PRINTF_BUF_LIMIT(_s, _end) .put = __file_str_put, __LOCK_INIT_NONE }, \
+        .pos = (_s),                                                                              \
+        .end = (_end),                                                                            \
     }
 
 #define FDEV_SETUP_STRING_ALLOC()                                                  \
