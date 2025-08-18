@@ -32,6 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
+ #define _DEFAULT_SOURCE
 #include <complex.h>
 #include <math.h>
 #include "cephes_subrf.h"
@@ -53,7 +54,7 @@ catanf(float complex z)
 		if (y > 1.0f) {
 			return CMPLXF((float)M_PI_2, 0.5f * logf((1.0f + y)/(y - 1.0f)));
 		}
-		if (y < -1.0) {
+		if (y < -1.0f) {
 			return CMPLXF((float)-M_PI_2, 0.5f * logf((1.0f - y)/(-y - 1.0f)));
 		}
 		if (fabsf(y) <= 1.0f) {

@@ -29,6 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+ #define _DEFAULT_SOURCE
 #include <complex.h>
 #include <math.h>
 #include "cephes_subrl.h"
