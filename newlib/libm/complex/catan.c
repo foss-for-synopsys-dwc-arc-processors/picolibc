@@ -34,12 +34,12 @@
 
 /*
 FUNCTION
-        <<catan>>, <<catanf>>---complex arc tangent
+	<<catan>>, <<catanf>>---complex arc tangent
 
 INDEX
-        catan
+	catan
 INDEX
-        catanf
+	catanf
 
 SYNOPSIS
        #include <complex.h>
@@ -48,37 +48,37 @@ SYNOPSIS
 
 
 DESCRIPTION
-        @ifnottex
-        These functions compute the complex arc tangent of <[z]>,
-        with branch cuts outside the interval [-i, +i] along the 
-        imaginary axis.
-        @end ifnottex
-        @tex
-        These functions compute the complex arc tangent of <[z]>,
-        with branch cuts outside the interval [$-i$, $+i$] along the 
-        imaginary axis.
-        @end tex
+	@ifnottex
+	These functions compute the complex arc tangent of <[z]>,
+	with branch cuts outside the interval [-i, +i] along the 
+	imaginary axis.
+	@end ifnottex
+	@tex
+	These functions compute the complex arc tangent of <[z]>,
+	with branch cuts outside the interval [$-i$, $+i$] along the 
+	imaginary axis.
+	@end tex
 
-        <<catanf>> is identical to <<catan>>, except that it performs
-        its calculations on <<floats complex>>.
+	<<catanf>> is identical to <<catan>>, except that it performs
+	its calculations on <<floats complex>>.
 
 RETURNS
-        @ifnottex
-        These functions return the complex arc tangent value, in the range
-        of a strip mathematically  unbounded  along the imaginary axis
-        and in the interval [-pi/2, +pi/2] along the real axis.
-        @end ifnottex
-        @tex
-        These functions return the complex arc tangent, in the range
-        of a strip mathematically  unbounded  along the imaginary axis
-        and in the interval [$-\pi/2$, $+\pi/2$] along the real axis.
-        @end tex
+	@ifnottex
+	These functions return the complex arc tangent value, in the range
+	of a strip mathematically  unbounded  along the imaginary axis
+	and in the interval [-pi/2, +pi/2] along the real axis.
+	@end ifnottex
+	@tex
+	These functions return the complex arc tangent, in the range
+	of a strip mathematically  unbounded  along the imaginary axis
+	and in the interval [$-\pi/2$, $+\pi/2$] along the real axis.
+	@end tex
 
 PORTABILITY
-        <<catan>> and <<catanf>> are ISO C99
+	<<catan>> and <<catanf>> are ISO C99
 
 QUICKREF
-        <<catan>> and <<catanf>> are ISO C99
+	<<catan>> and <<catanf>> are ISO C99
 
 */
 
@@ -100,8 +100,17 @@ catan(double complex z)
 	x = creal(z);
 	y = cimag(z);
 
-	if ((x == 0.0) && (y > 1.0))
-		goto ovrf;
+	if (x == 0.0) {
+		if (y > 1.0) {
+			return CMPLX(M_PI_2, 0.5 * log((1.0 + y)/(y - 1.0)));
+		}
+		if (y < -1.0) {
+			return CMPLX(-M_PI_2, 0.5 * log((1.0 - y)/(-y - 1.0)));
+		}
+		if (fabs(y) <= 1.0) {
+			return CMPLX(0.0, atanh(y));
+		}
+	}
 
 	x2 = x * x;
 	a = 1.0 - x2 - (y * y);

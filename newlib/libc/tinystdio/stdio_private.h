@@ -49,6 +49,13 @@
 #include <stdio-bufio.h>
 #include <sys/lock.h>
 
+#ifdef __IO_PERCENT_N
+#define PRINTF_BUF_LIMIT(_s, _end) \
+    .buflimit = (size_t)((_end) ? ((char *)(_end) - (char *)(_s)) : (INT_MAX)),
+#else
+#define PRINTF_BUF_LIMIT(_s, _end)
+#endif
+
 struct __file_str {
 	struct __file file;	/* main file struct */
         char	*pos;		/* current buffer position */
@@ -111,6 +118,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define FDEV_SETUP_STRING_WRITE(_s, _end) {	\
 		.file = {			\
 			.flags = __SWR,		\
+			PRINTF_BUF_LIMIT(_s, _end)	\
 			.put = __file_str_put,	\
                         __LOCK_INIT_NONE        \
 		},				\
