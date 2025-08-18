@@ -1249,7 +1249,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         base = 2;
 #endif
                     } else {
-                        my_putc('%', stream);
+                        while (--width > 0) {
+                            my_putc(' ', stream);
+                        }
                         my_putc(c, stream);
                         continue;
                     }
