@@ -72,7 +72,13 @@
             base = 2;
 #endif
         } else {
+#ifndef _NEED_IO_SHRINK
+            while (--width > 0) {
+                my_putc(' ', stream);
+            }
+#else
             my_putc('%', stream);
+#endif
             my_putc(c, stream);
             continue;
         }
