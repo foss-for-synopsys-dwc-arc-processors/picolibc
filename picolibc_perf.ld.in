@@ -145,22 +145,22 @@ SECTIONS
 
 	/* additional sections when compiling with C++ exception support */
 	@CPP_START@
-	.except_ordered : {
+	.except_ordered (READONLY) : {
 		*(.gcc_except_table *.gcc_except_table.*)
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} >flash AT>flash :text
-	.eh_frame_hdr : {
+	.eh_frame_hdr (READONLY) : {
 		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
 		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
 		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
 	} >flash AT>flash :text
-	.eh_frame : {
+	.eh_frame (READONLY) : {
 		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
 		KEEP (*(.eh_frame .eh_frame.*))
 		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
 	} >flash AT>flash :text
 
-	.except_unordered : {
+	.except_unordered (READONLY) : {
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
 		PROVIDE(@PREFIX@__exidx_start = .);
