@@ -144,7 +144,7 @@ SECTIONS
 	 * so that the linker will compute the offsets to those
 	 * entries correctly.
 	 */
-	.got : {
+	.got (READONLY) : {
 		*(.got.plt)
 		*(.got)
 	} >flash AT>flash :text
