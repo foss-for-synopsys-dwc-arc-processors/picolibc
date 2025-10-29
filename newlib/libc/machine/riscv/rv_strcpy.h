@@ -92,28 +92,44 @@ char *__libc_strcpy(char *dst, const char *src, bool ret_start)
       dst = (char *)pdst;
       src = (const char *)psrc;
 
+      char c0 = src[0];
+      char c1 = src[1];
+      char c2 = src[2];
+        
       if (ret_start)
         {
-          if (!(*dst++ = src[0])) return dst0;
-          if (!(*dst++ = src[1])) return dst0;
-          if (!(*dst++ = src[2])) return dst0;
+          if (!(*dst++ = c0)) return dst0;
+          if (!(*dst++ = c1)) return dst0;
           #if __riscv_xlen == 64
-            if (!(*dst++ = src[3])) return dst0;
-            if (!(*dst++ = src[4])) return dst0;
-            if (!(*dst++ = src[5])) return dst0;
-            if (!(*dst++ = src[6])) return dst0;
+            char c3 = src[3];
+          #endif
+          if (!(*dst++ = c2)) return dst0;
+          #if __riscv_xlen == 64
+            char c4 = src[4];
+            if (!(*dst++ = c3)) return dst0;
+            char c5 = src[5];
+            if (!(*dst++ = c4)) return dst0;
+            char c6 = src[6];
+            if (!(*dst++ = c5)) return dst0;
+            if (!(*dst++ = c6)) return dst0;
           #endif
         }
       else
         {
-          if (!(*dst++ = src[0])) return dst - 1;
-          if (!(*dst++ = src[1])) return dst - 1;
-          if (!(*dst++ = src[2])) return dst - 1;
+          if (!(*dst++ = c0)) return dst - 1;
+          if (!(*dst++ = c1)) return dst - 1;
           #if __riscv_xlen == 64
-            if (!(*dst++ = src[3])) return dst - 1;
-            if (!(*dst++ = src[4])) return dst - 1;
-            if (!(*dst++ = src[5])) return dst - 1;
-            if (!(*dst++ = src[6])) return dst - 1;
+            char c3 = src[3];
+          #endif
+          if (!(*dst++ = c2)) return dst - 1;
+          #if __riscv_xlen == 64
+            char c4 = src[4];
+            if (!(*dst++ = c3)) return dst - 1;
+            char c5 = src[5];
+            if (!(*dst++ = c4)) return dst - 1;
+            char c6 = src[6];
+            if (!(*dst++ = c5)) return dst - 1;
+            if (!(*dst++ = c6)) return dst - 1;
             dst0 = dst;
           #endif
         }
