@@ -37,7 +37,7 @@ add_library(picocrt OBJECT ../arc/crt0.c)
 add_library(picocrt-semihost OBJECT ../arc/crt0.c)
 
 target_compile_options(picocrt PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
-target_compile_options(picocrt-semihost PRIVATE -DCRT0_EXIT -DCRT0_SEMIHOST ${PICOLIBC_COMPILE_OPTIONS})
+target_compile_options(picocrt-semihost PRIVATE -DCRT0_EXIT -DCRT0_SEMIHOST -DCRT0_SEMIHOST_TRAP ${PICOLIBC_COMPILE_OPTIONS})
 
 target_include_directories(picocrt SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
 target_include_directories(picocrt-semihost SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})

@@ -189,7 +189,7 @@ void _cstart(void)
 }
 
 
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
 
 /*
  * Trap faults, print message and exit when running under semihost
@@ -247,4 +247,4 @@ void aarch64_fault(struct fault *f, int reason)
     _exit(1);
 }
 
-#endif /* CRT0_SEMIHOST */
+#endif /* CRT0_SEMIHOST_TRAP */
