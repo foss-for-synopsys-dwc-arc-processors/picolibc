@@ -85,46 +85,37 @@ char *__libc_strcpy(char *dst, const char *src, bool ret_start)
     {
       uintxlen_t *pdst = (uintxlen_t *)dst;
       const uintxlen_t *psrc = (const uintxlen_t *)src;
-      uintxlen_t s;
 
-      while (!__libc_detect_null(s = *psrc))
-        {
-          *pdst++ = s;
-          psrc++;
-        }
+      while (!__libc_detect_null(*psrc))
+        *pdst++ = *psrc++;
 
       dst = (char *)pdst;
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define SBYTE(s, i)        ((char) ((s) >> ((i) * 8)))
-#else
-#define SBYTE(s, i)        ((char) ((s) >> ((sizeof(s) - 1 - (i)) * 8)))
-#endif
+      src = (const char *)psrc;
 
       if (ret_start)
         {
-          if (!(*dst++ = SBYTE(s, 0))) return dst0;
-          if (!(*dst++ = SBYTE(s, 1))) return dst0;
-          if (!(*dst++ = SBYTE(s, 2))) return dst0;
-#if __riscv_xlen == 64
-          if (!(*dst++ = SBYTE(s, 3))) return dst0;
-          if (!(*dst++ = SBYTE(s, 4))) return dst0;
-          if (!(*dst++ = SBYTE(s, 5))) return dst0;
-          if (!(*dst++ = SBYTE(s, 6))) return dst0;
-#endif
+          if (!(*dst++ = src[0])) return dst0;
+          if (!(*dst++ = src[1])) return dst0;
+          if (!(*dst++ = src[2])) return dst0;
+          #if __riscv_xlen == 64
+            if (!(*dst++ = src[3])) return dst0;
+            if (!(*dst++ = src[4])) return dst0;
+            if (!(*dst++ = src[5])) return dst0;
+            if (!(*dst++ = src[6])) return dst0;
+          #endif
         }
       else
         {
-          if (!(*dst++ = SBYTE(s, 0))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 1))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 2))) return dst - 1;
-#if __riscv_xlen == 64
-          if (!(*dst++ = SBYTE(s, 3))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 4))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 5))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 6))) return dst - 1;
-#endif
-          dst0 = dst;
+          if (!(*dst++ = src[0])) return dst - 1;
+          if (!(*dst++ = src[1])) return dst - 1;
+          if (!(*dst++ = src[2])) return dst - 1;
+          #if __riscv_xlen == 64
+            if (!(*dst++ = src[3])) return dst - 1;
+            if (!(*dst++ = src[4])) return dst - 1;
+            if (!(*dst++ = src[5])) return dst - 1;
+            if (!(*dst++ = src[6])) return dst - 1;
+            dst0 = dst;
+          #endif
         }
 
       *dst = 0;
