@@ -45,10 +45,6 @@ picocrt_machines = [
     # Suffix used on file names, QEMU's is empty because it is the default.
     'suffix': '',
   },
-  {
-    'name': 'nsim',
-    'suffix': '_nsim',
-  }
 ]
 
 machine_dir = 'machine' / host_cpu_family
@@ -146,11 +142,7 @@ picocrt_variants = [
 
 # Use the semihost version of crt0 for testing as that
 # will have exception handling
-if test_machine == 'nsim'
-  crt0_test = 'crt0_arcv_semihost_trap'
-else
-  crt0_test = 'crt0_semihost_trap'
-endif
+crt0_test = 'crt0_semihost_trap'
 
 foreach params : targets
   target = params['name']

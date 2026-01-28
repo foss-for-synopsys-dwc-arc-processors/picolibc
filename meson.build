@@ -1557,11 +1557,7 @@ has_semihost = false
 # arm compatible semihosting, enough to run arm semihost tests
 has_arm_semihost = false
 
-if test_machine == 'nsim'
-  crt0_test = 'crt0_arcv_hosted'
-else
-  crt0_test = 'crt0_hosted'
-endif
+crt0_test = 'crt0_hosted'
 
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
