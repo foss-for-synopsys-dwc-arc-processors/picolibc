@@ -107,36 +107,6 @@ picocrt_variants = [
     'suffix': '-semihost-trap',
     'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
     'src': src_picocrt,
-  },
-  {
-    'name': 'arcv',
-    'suffix': '-arcv',
-    'c_args': ['-DCRT0_ARCV'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'arcv-hosted',
-    'suffix': '-arcv-hosted',
-    'c_args': ['-DCRT0_ARCV', '-DCRT0_EXIT'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'arcv-minimal',
-    'suffix': '-arcv-minimal',
-    'c_args': ['-DCRT0_ARCV', '-DCONSTRUCTORS=0'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'arcv-semihost',
-    'suffix': '-arcv-semihost',
-    'c_args': ['-DCRT0_ARCV', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'arcv-semihost-trap',
-    'suffix': '-arcv-semihost-trap',
-    'c_args':  ['-DCRT0_ARCV', '-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
-    'src': src_picocrt,
   }
 ]
 
