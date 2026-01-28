@@ -42,7 +42,7 @@ _cstart(void)
 	__start();
 }
 
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
 #include <unistd.h>
 #include <stdio.h>
 
@@ -196,7 +196,7 @@ _start(void)
                 "csrxchg	$t0, $t0, 0x2\n"); /* EUEN */
 #endif
 
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
         __asm__("la.abs         $t0, _trap");
         __asm__("csrwr          $t0, 0xc");
 #endif

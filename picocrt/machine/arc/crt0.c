@@ -72,7 +72,7 @@ _start(void)
     __asm__("nop");
 }
 
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
 
 /*
  * Trap faults, print message and exit when running under semihost

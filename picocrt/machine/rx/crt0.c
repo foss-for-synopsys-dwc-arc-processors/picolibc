@@ -75,7 +75,7 @@ _start(void)
     __start();
 }
 
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
 
 #include <unistd.h>
 #include <stdio.h>

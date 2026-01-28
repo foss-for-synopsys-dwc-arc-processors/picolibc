@@ -101,18 +101,12 @@ picocrt_variants = [
     'suffix': '-semihost',
     'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
     'src': src_picocrt,
-  },
-  {
-    'name': 'semihost-trap',
-    'suffix': '-semihost-trap',
-    'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
-    'src': src_picocrt,
   }
 ]
 
 # Use the semihost version of crt0 for testing as that
 # will have exception handling
-crt0_test = 'crt0_semihost_trap'
+crt0_test = 'crt0_semihost'
 
 foreach params : targets
   target = params['name']

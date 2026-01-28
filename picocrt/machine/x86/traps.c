@@ -38,7 +38,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
 
 /* Trap faults, print error message and exit */
 

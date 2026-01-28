@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
 	
 	.macro trap name, str
 	.section	.text.\name,"ax",@progbits

@@ -143,7 +143,7 @@ _start:
 
 
 /************ Exception handlers ************/
-#ifdef CRT0_SEMIHOST_TRAP
+#ifdef CRT0_SEMIHOST
 
   .macro vector_common
   sub sp, sp, #256
@@ -216,4 +216,4 @@ aarch64_\name\()_vector:
   exception_handler fiq, 2
   exception_handler serror, 3
 
-#endif // CRT0_SEMIHOST_TRAP
+#endif // CRT0_SEMIHOST
