@@ -69,10 +69,8 @@ open(const char *pathname, int flags, ...)
 	default:
 		if (flags & O_TRUNC)
 			semiflags = SH_OPEN_W_PLUS_B;	/* 'wb+' */
-		else if (flags & O_APPEND)
-			semiflags = SH_OPEN_A_PLUS_B;	/* 'ab+' */
 		else
-			semiflags = SH_OPEN_R_PLUS_B;	/* 'rb+' */
+			semiflags = SH_OPEN_A_PLUS_B;	/* 'ab+' */
 		break;
 	}
 
