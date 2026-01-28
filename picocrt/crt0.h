@@ -91,8 +91,7 @@ extern void __libc_init_array(void);
 static __noreturn __always_inline void
 __start(void)
 {
-	if (&__data_start[0] != &__data_source[0])
-		memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
 #ifdef POST_MEMORY_SETUP
         POST_MEMORY_SETUP();
