@@ -364,7 +364,7 @@ _start(void)
 
 #endif
 
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
 
 /*
  * Trap faults, print message and exit when running under semihost
@@ -524,4 +524,4 @@ arm_data_abort_vector(void)
 
 #endif /* else __ARM_ARCH_PROFILE == 'M' */
 
-#endif /* CRT0_SEMIHOST */
+#endif /* CRT0_SEMIHOST_TRAP */

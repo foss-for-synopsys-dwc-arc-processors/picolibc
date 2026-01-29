@@ -136,7 +136,7 @@ foreach params : targets
     _test_link_args_noflash_variable = 'test_link_args_noflash' + target
     _link_args_no_flash = target_c_args + _lib_files + get_variable('test_link_args_noflash' + target, test_link_args_noflash)
     _link_depends_no_flash = get_variable('test_link_depends_noflash' + target, test_link_depends_noflash) + _libs
-    _objs_no_flash = get_variable('crt0_noflash_semihost' + target, get_variable('crt0_noflash_semihost' + target))
+    _objs_no_flash = get_variable('crt0_noflash_semihost_trap' + target, get_variable('crt0_noflash_semihost_trap' + target))
   endif
 
   t1 = 'try-ilp32'
@@ -267,10 +267,10 @@ foreach params : targets
 	 env: test_env)
   endif
 
-  if is_variable('crt0_inittls_semihost' + target)
+  if is_variable('crt0_inittls_semihost_trap' + target)
     _link_inittls_args = target_c_args + _lib_files + get_variable('test_inittls_link_args' + target, test_link_args)
     _link_inittls_depends = get_variable('test_inittls_link_depends' + target, test_inittls_link_depends) + _libs
-    _objs_inittls = [get_variable('crt0_inittls_semihost'+ target)]
+    _objs_inittls = [get_variable('crt0_inittls_semihost_trap'+ target)]
     t1 = 'tls-init'
 
     test(t1 + target,

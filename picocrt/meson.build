@@ -107,9 +107,21 @@ picocrt_variants = [
     'src': src_picocrt,
   },
   {
+    'name': 'semihost-trap',
+    'suffix': '-semihost-trap',
+    'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
+    'src': src_picocrt,
+  },
+  {
     'name': 'noflash-semihost',
     'suffix': '-noflash-semihost',
     'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'noflash-semihost-trap',
+    'suffix': '-noflash-semihost-trap',
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
     'src': src_picocrt,
   },
   {
@@ -122,7 +134,7 @@ picocrt_variants = [
 
 # Use the semihost version of crt0 for testing as that
 # will have exception handling
-crt0_test = 'crt0_semihost'
+crt0_test = 'crt0_semihost_trap'
 
 if thread_local_storage
   picocrt_variants += {
@@ -135,6 +147,12 @@ if thread_local_storage
     'name': 'inittls-semihost',
     'suffix': '-inittls-semihost',
     'c_args': ['-DINIT_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  }
+  picocrt_variants += {
+    'name': 'inittls-semihost-trap',
+    'suffix': '-inittls-semihost-trap',
+    'c_args': ['-DINIT_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SEMIHOST_TRAP'],
     'src': src_picocrt,
   }
 endif
