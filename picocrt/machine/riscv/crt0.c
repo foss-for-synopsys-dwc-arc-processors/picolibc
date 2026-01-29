@@ -36,6 +36,10 @@
 #include <stddef.h>
 #include "../../crt0.h"
 
+#ifdef CRT0_ARCV
+#include "arcv.h"
+#endif
+
 static void __used __section(".init")
 _cstart(void)
 {
@@ -231,6 +235,10 @@ _start(void)
             "or	t0, t1, t0\n"
             "csrw	mstatus, t0\n"
             "csrwi	vxrm, 1");
+#endif
+#ifdef CRT0_ARCV
+    __asm__("jal    _arcv_cache_enable");
+    __asm__("jal    _arcv_vector_enable");
 #endif
 #ifdef CRT0_SEMIHOST
 #ifdef __riscv_cmodel_large
