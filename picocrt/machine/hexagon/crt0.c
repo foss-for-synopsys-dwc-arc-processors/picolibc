@@ -37,7 +37,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../../crt0.h"
 
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
 
 #define DECL_HEXAGON_REG(R)                          \
     static inline uint32_t hexagon_read_##R()        \
@@ -75,7 +75,7 @@ coredump()
 void __attribute__((noreturn))
 _cstart()
 {
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
     hexagon_write_SSR(0);
 #endif
     __start();

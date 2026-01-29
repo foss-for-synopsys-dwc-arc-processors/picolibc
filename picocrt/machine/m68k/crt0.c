@@ -57,7 +57,7 @@ _start(void)
     __start();
 }
 
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
 
 /*
  * Trap faults, print message and exit when running under semihost

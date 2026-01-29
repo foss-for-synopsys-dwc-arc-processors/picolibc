@@ -36,7 +36,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     .global _start
     .type _start, @function
 _start:
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
     // Setup event vector base
     r0 = ##.EventVectors
     EVB = r0
@@ -47,7 +47,7 @@ _start:
     jump _cstart
     .size _start, . - _start
 
-#ifdef CRT0_SEMIHOST
+#ifdef CRT0_SEMIHOST_TRAP
     .text
     .p2align 4
     .type event_handle_reset, @function
