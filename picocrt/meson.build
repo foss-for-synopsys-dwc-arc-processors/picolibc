@@ -139,6 +139,21 @@ if thread_local_storage
   }
 endif
 
+arcv_picocrt_variants = []
+
+foreach variant : picocrt_variants
+  if variant['name'] != 'none'
+    arcv_picocrt_variants += {
+      'name': 'arcv-' + variant['name'],
+      'suffix': '-arcv' + variant['suffix'],
+      'c_args': variant['c_args'] + ['-DCRT0_ARCV'],
+      'src': variant['src'],
+    }
+  endif
+endforeach
+
+picocrt_variants += arcv_picocrt_variants
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
