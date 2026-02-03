@@ -126,6 +126,7 @@ SECTIONS
 @CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 	.rodata : {
+		PROVIDE( @PREFIX@__SDATA_BEGIN__ = . );
 
 		/* read-only data */
 		*(.rdata)
