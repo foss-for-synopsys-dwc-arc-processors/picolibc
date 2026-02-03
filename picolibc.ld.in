@@ -186,6 +186,14 @@ SECTIONS
 @BFD@	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
 
 	/*
+	 * JLI (Jump and Link Indexed) table for ARC Classic
+	 */
+	.jlitab : {
+		PROVIDE( @PREFIX@__JLI_TABLE__ = .);
+		jlitab*.o:(.jlitab*) *(.jlitab*)
+	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
+
+	/*
 	 * Needs to be in its own segment with the PLT entries first
 	 * so that the linker will compute the offsets to those
 	 * entries correctly.
@@ -465,6 +473,8 @@ SECTIONS
 	.debug_str_offsets 0 : { *(.debug_str_offsets) }
 	.debug_sup      0 : { *(.debug_sup) }
 	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+	/* ARC extension sections */
+	.arcextmap      0 : { *(.arcextmap.*) }
 }
 /*
  * Check that sections that are copied from flash to RAM have matching
