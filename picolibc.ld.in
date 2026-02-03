@@ -126,7 +126,6 @@ SECTIONS
 @CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 	.rodata : {
-		PROVIDE( @PREFIX@__SDATA_BEGIN__ = . );
 
 		/* read-only data */
 		*(.rdata)
@@ -184,6 +183,14 @@ SECTIONS
 @BFD@
 @BFD@	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
 @BFD@	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
+
+	/*
+	 * JLI (Jump and Link Indexed) table for ARC Classic
+	 */
+	.jlitab : {
+		PROVIDE( @PREFIX@__JLI_TABLE__ = .);
+		jlitab*.o:(.jlitab*) *(.jlitab*)
+	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 	/*
 	 * Needs to be in its own segment with the PLT entries first
@@ -244,6 +251,7 @@ SECTIONS
 		/* Need to pre-align so that the symbols come after padding */
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 
+		PROVIDE( @PREFIX@__SDATA_BEGIN__ = . + 0x100 );
 		PROVIDE( @PREFIX@__global_pointer$ = . + 0x800 );
 		PROVIDE( @PREFIX@_gp = . + 0x8000);
 		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
@@ -465,6 +473,8 @@ SECTIONS
 	.debug_str_offsets 0 : { *(.debug_str_offsets) }
 	.debug_sup      0 : { *(.debug_sup) }
 	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+	/* ARC extension sections */
+	.arcextmap      0 : { *(.arcextmap.*) }
 }
 /*
  * Check that sections that are copied from flash to RAM have matching
