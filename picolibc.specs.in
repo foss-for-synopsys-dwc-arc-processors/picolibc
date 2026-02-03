@@ -15,8 +15,11 @@
 *link:
 @SPECS_PRINTF@ @SPECS_LIBPATH@ %{-printf=*:--defsym=@PREFIX@vfprintf=@PREFIX@__%*_vfprintf} %{-scanf=*:--defsym=@PREFIX@vfscanf=@PREFIX@__%*_vfscanf} %{!T:-T@PICOLIBC_LD@} %(picolibc_link) --gc-sections @LINK_SPEC@
 
+*link_gcc_c_sequence:
+--start-group %(libgcc) -lc %{-oslib=*:-l%*} --end-group
+
 *lib:
---start-group %(libgcc) @ADDITIONAL_LIBS@ -lc %{-oslib=*:-l%*} --end-group
+
 
 *endfile:
 @CRTEND@
