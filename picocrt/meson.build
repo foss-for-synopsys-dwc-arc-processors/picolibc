@@ -157,20 +157,22 @@ if thread_local_storage
   }
 endif
 
-arcv_picocrt_variants = []
+if host_cpu_family == 'riscv'
+  arcv_picocrt_variants = []
 
-foreach variant : picocrt_variants
-  if variant['name'] != 'none'
-    arcv_picocrt_variants += {
-      'name': 'arcv-' + variant['name'],
-      'suffix': '-arcv' + variant['suffix'],
-      'c_args': variant['c_args'] + ['-DCRT0_ARCV'],
-      'src': variant['src'],
-    }
-  endif
-endforeach
+  foreach variant : picocrt_variants
+    if variant['name'] != 'none'
+      arcv_picocrt_variants += {
+        'name': 'arcv-' + variant['name'],
+        'suffix': '-arcv' + variant['suffix'],
+        'c_args': variant['c_args'] + ['-DCRT0_ARCV'],
+        'src': variant['src'],
+      }
+    endif
+  endforeach
 
-picocrt_variants += arcv_picocrt_variants
+  picocrt_variants += arcv_picocrt_variants
+endif
 
 foreach params : targets
   target = params['name']
