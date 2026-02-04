@@ -115,6 +115,18 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
+  if host_cpu_family == 'arc'
+    has_rf16_code = '''
+    #ifndef __ARC_RF16__
+    #error __ARC_RF16__ is not defined
+    #endif
+    '''
+
+    if cc.compiles(has_rf16_code, args: target_c_args + c_args)
+      continue
+    endif
+  endif
+
   _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
