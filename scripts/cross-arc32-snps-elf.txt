@@ -1,0 +1,23 @@
+[binaries]
+c = ['arc32-snps-elf-gcc', '-nostdlib']
+cpp = ['arc32-snps-elf-g++', '-nostdlib']
+ar = 'arc32-snps-elf-ar'
+as = 'arc32-snps-elf-as'
+nm = 'arc32-snps-elf-nm'
+strip = 'arc32-snps-elf-strip'
+# only needed to run tests
+exe_wrapper = ['env', 'run-arc']
+
+[host_machine]
+system = 'snps'
+cpu_family = 'arc32'
+cpu = 'arc32'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+has_link_defsym = true
+default_flash_addr = '0x00000000'
+default_flash_size = '0x00400000'
+default_ram_addr   = '0x00400000'
+default_ram_size   = '0x00400000'
