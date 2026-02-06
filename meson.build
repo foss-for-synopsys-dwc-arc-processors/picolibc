@@ -1944,3 +1944,7 @@ configure_file(output : 'picolibc.h',
 if not enable_multilib and meson.is_subproject()
   picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c])
 endif
+
+if host_cpu_family == 'arc'
+  subdir('platforms/arc')
+endif
