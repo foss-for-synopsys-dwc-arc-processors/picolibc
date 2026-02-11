@@ -69,6 +69,12 @@ readelf="arc-zephyr-elf-readelf"
 if ! which $readelf >/dev/null 2>/dev/null; then
     readelf="arc-snps-elf-readelf"
 fi
+if ! which $readelf >/dev/null 2>/dev/null; then
+    readelf="arc32-snps-elf-readelf"
+fi
+if ! which $readelf >/dev/null 2>/dev/null; then
+    readelf="arc64-snps-elf-readelf"
+fi
 
 # If readelf is installed, we can use the attributes
 # in the file to determine the target cpu
