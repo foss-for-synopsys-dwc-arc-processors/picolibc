@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024, Synopsys Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,15 +35,6 @@
 
 #include "../../crt0.h"
 
-/* Define __ARCEM__ and __ARCHS__ for older GCC for ARC */
-#if defined (__EM__) && !defined (__ARCEM__)
-#define __ARCEM__ 1
-#endif
-
-#if defined (__HS__) && !defined (__ARCHS__)
-#define __ARCHS__ 1
-#endif
-
 static void __used __section(".init")
 _cstart(void)
 {
@@ -51,81 +42,93 @@ _cstart(void)
 }
 
 extern char __stack[];
-extern char __SDATA_BEGIN__[];
-extern char __JLI_TABLE__[];
 extern void(* const __vector_table[]);
-
+/**
+ * Below 2 different macros are defined for MOV:
+ * 
+ *     1. MOV. For 64-bit targets it uses movl and for 32-bit targets
+ *        it uses mov_s. For this crt0 it's enough to pack all values
+ *        to fit in encodings. We dont's used movl_s for 64-bit by default
+ *        because it does not support the same range of registers as
+ *        mov_s for 32-bit targets.
+ *     2. MOV_S. This macro must be used if we are sure that everything
+ *        will fit in mov_s/movl_s.
+ */
+#ifdef __ARC64_ARCH64__
+#define SRR  "srl"
+#define LRR  "lrl"
+#define PUSH "pushl"
+#define MOV "movl"
+#define MOV_S "movl_s"
+typedef uint64_t reg_t;
+#else
 #define SRR  "sr"
 #define LRR  "lr"
 #define PUSH "push"
+#define MOV "mov_s"
+#define MOV_S "mov_s"
 typedef uint32_t reg_t;
+#endif
 
 void __naked __section(".init") __used
 _start(void)
 {
     /**
      * Set STATUS32.AD bit to enable referencing unaligned
-     * memory addresses for ARC HS
+     * memory addresses
      */
-#ifdef __ARCHS__
     __asm__(LRR " r2, [0xA]\n"
             "bset r2, r2, 19\n"
             "flag r2");
+
+    /* Set up the stack pointer and the vector table */
+#ifdef __ARC64_ARCH64__
+    /**
+     * 64-bit absolute addresses are loaded with a pair of instructions
+     * which have an associated pair of relocations: R_ARC_LO32_ME and
+     * R_ARC_HI32_ME.
+     */
+    __asm__("movhl_s sp, %0" : : "i"(__stack));
+    __asm__("orl_s sp, sp, %0" : : "i"(__stack));
+
+    __asm__("movhl_s r2, %0" : : "i"(__vector_table));
+    __asm__("orl_s r2, r2, %0" : : "i"(__vector_table));
+    __asm__("srl r2, [0x25]");
+#else
+    __asm__("mov_s sp, %0" : : "i"(__stack));
+    __asm__("sr %0, [0x25]" : : "i"(__vector_table));
 #endif
-
-    /* Initialize JLI (Jump and Link Indexed) table */
-#ifdef __ARC_CODE_DENSITY__
-    __asm__(SRR " %0, [jli_base]" : : "r"(__JLI_TABLE__));
-#endif
-
-    /* Set up the stack pointer */
-    __asm__("mov sp, %0" : : "i"(__stack));
-
-    /* Set up the global pointer */
-    __asm__("mov gp, %0" : : "i"(__SDATA_BEGIN__));
-
-    /* Set up the vector table */
-    __asm__(SRR " %0, [0x25]" : : "i"(__vector_table));
 
     /* Clear the registers except r26 (GP) and r28 (SP) */
-    __asm__("mov_s r0, 0\n"
-            "mov_s r1, 0\n"
-            "mov_s r2, 0\n"
-            "mov_s r3, 0\n"
-#ifndef __ARC_RF16__
-            "mov r4, 0\n"
-            "mov r5, 0\n"
-            "mov r6, 0\n"
-            "mov r7, 0\n"
-            "mov r8, 0\n"
-            "mov r9, 0\n"
-#endif
-            "mov r10, 0\n"
-            "mov r11, 0\n"
-            "mov_s r12, 0\n"
-            "mov_s r13, 0\n"
-            "mov_s r14, 0\n"
-            "mov_s r15, 0\n"
-#ifndef __ARC_RF16__
-            "mov r16, 0\n"
-            "mov r17, 0\n"
-            "mov r18, 0\n"
-            "mov r19, 0\n"
-            "mov r20, 0\n"
-            "mov r21, 0\n"
-            "mov r22, 0\n"
-            "mov r23, 0\n"
-            "mov r24, 0\n"
-            "mov r25, 0\n"
-#endif
-            "mov r27, 0\n"
-#if defined (__ARCEM__) || defined (__ARCHS__)
-            "mov ilink, 0\n"
-            "mov r30, 0\n");
-#else
-            "mov ilink1, 0\n"
-            "mov ilink2, 0\n");
-#endif
+    __asm__(MOV " r0, 0\n"
+            MOV " r1, 0\n"
+            MOV " r2, 0\n"
+            MOV " r3, 0\n"
+            MOV " r4, 0\n"
+            MOV " r5, 0\n"
+            MOV " r6, 0\n"
+            MOV " r7, 0\n"
+            MOV " r8, 0\n"
+            MOV " r9, 0\n"
+            MOV " r10, 0\n"
+            MOV " r11, 0\n"
+            MOV " r12, 0\n"
+            MOV " r13, 0\n"
+            MOV " r14, 0\n"
+            MOV " r15, 0\n"
+            MOV " r16, 0\n"
+            MOV " r17, 0\n"
+            MOV " r18, 0\n"
+            MOV " r19, 0\n"
+            MOV " r20, 0\n"
+            MOV " r21, 0\n"
+            MOV " r22, 0\n"
+            MOV " r23, 0\n"
+            MOV " r24, 0\n"
+            MOV " r25, 0\n"
+            MOV " r27, 0\n"
+            MOV " ilink, 0\n"
+            MOV " r30, 0\n");
 
     /* Branch to C code */
     __asm__("j _cstart");
@@ -209,8 +212,6 @@ arc_fault(struct fault *f, int reason)
     _exit(1);
 }
 
-#ifndef __ARC_RF16__
-
 #define VECTOR_COMMON                                                   \
     __asm__(PUSH "  r31\n " PUSH " r30\n " PUSH " r29\n " PUSH " r28"); \
     __asm__(PUSH "  r27\n " PUSH " r26\n " PUSH " r25\n " PUSH " r24"); \
@@ -225,29 +226,13 @@ arc_fault(struct fault *f, int reason)
     __asm__(LRR " r0, [0x402]\n " PUSH " r0");                          \
     __asm__(LRR " r0, [0x401]\n " PUSH " r0");                          \
     __asm__(LRR " r0, [0x400]\n " PUSH " r0");                          \
-    __asm__("mov_s r0, sp")
-
-#else
-
-#define VECTOR_COMMON                                                   \
-    __asm__(PUSH "  r31\n " PUSH " r30\n " PUSH " r29\n " PUSH " r28"); \
-    __asm__(PUSH "  r27\n " PUSH " r26\n " PUSH " r15\n " PUSH " r14"); \
-    __asm__(PUSH "  r13\n " PUSH " r12\n " PUSH " r11\n " PUSH " r10"); \
-    __asm__(PUSH "   r3\n " PUSH "  r2\n " PUSH "  r1\n " PUSH "  r0"); \
-    __asm__(LRR " r0, [0x404]\n " PUSH " r0");                          \
-    __asm__(LRR " r0, [0x403]\n " PUSH " r0");                          \
-    __asm__(LRR " r0, [0x402]\n " PUSH " r0");                          \
-    __asm__(LRR " r0, [0x401]\n " PUSH " r0");                          \
-    __asm__(LRR " r0, [0x400]\n " PUSH " r0");                          \
-    __asm__("mov_s r0, sp")
-
-#endif
+    __asm__(MOV " r0, sp")
 
 void __naked __section(".init")
 arc_memory_error_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_MEMORY_ERROR));
+    __asm__(MOV_S " r1, " REASON(REASON_MEMORY_ERROR));
     __asm__("j arc_fault");
 }
 
@@ -255,7 +240,7 @@ void __naked __section(".init")
 arc_instruction_error_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_INSTRUCTION_ERROR));
+    __asm__(MOV_S " r1, " REASON(REASON_INSTRUCTION_ERROR));
     __asm__("j arc_fault");
 }
 
@@ -263,7 +248,7 @@ void __naked __section(".init")
 arc_machine_check_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_MACHINE_CHECK));
+    __asm__(MOV_S " r1, " REASON(REASON_MACHINE_CHECK));
     __asm__("j arc_fault");
 }
 
@@ -271,7 +256,7 @@ void __naked __section(".init")
 arc_tlb_miss_i_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_TLB_MISS_I));
+    __asm__(MOV_S " r1, " REASON(REASON_TLB_MISS_I));
     __asm__("j arc_fault");
 }
 
@@ -279,7 +264,7 @@ void __naked __section(".init")
 arc_tlb_miss_d_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_TLB_MISS_D));
+    __asm__(MOV_S " r1, " REASON(REASON_TLB_MISS_D));
     __asm__("j arc_fault");
 }
 
@@ -287,7 +272,7 @@ void __naked __section(".init")
 arc_prot_v_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_PROT_V));
+    __asm__(MOV_S " r1, " REASON(REASON_PROT_V));
     __asm__("j arc_fault");
 }
 
@@ -295,7 +280,7 @@ void __naked __section(".init")
 arc_privilege_v_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_PRIVILEGE_V));
+    __asm__(MOV_S " r1, " REASON(REASON_PRIVILEGE_V));
     __asm__("j arc_fault");
 }
 
@@ -303,7 +288,7 @@ void __naked __section(".init")
 arc_swi_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_SWI));
+    __asm__(MOV_S " r1, " REASON(REASON_SWI));
     __asm__("j arc_fault");
 }
 
@@ -311,7 +296,7 @@ void __naked __section(".init")
 arc_trap_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_TRAP));
+    __asm__(MOV_S " r1, " REASON(REASON_TRAP));
     __asm__("j arc_fault");
 }
 
@@ -319,7 +304,7 @@ void __naked __section(".init")
 arc_extension_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_EXTENSION));
+    __asm__(MOV_S " r1, " REASON(REASON_EXTENSION));
     __asm__("j arc_fault");
 }
 
@@ -327,7 +312,7 @@ void __naked __section(".init")
 arc_div_zero_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_DIV_ZERO));
+    __asm__(MOV_S " r1, " REASON(REASON_DIV_ZERO));
     __asm__("j arc_fault");
 }
 
@@ -335,7 +320,7 @@ void __naked __section(".init")
 arc_dc_error_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_DC_ERROR));
+    __asm__(MOV_S " r1, " REASON(REASON_DC_ERROR));
     __asm__("j arc_fault");
 }
 
@@ -343,7 +328,7 @@ void __naked __section(".init")
 arc_maligned_vector(void)
 {
     VECTOR_COMMON;
-    __asm__("mov_s r1, " REASON(REASON_MALIGNED));
+    __asm__(MOV_S " r1, " REASON(REASON_MALIGNED));
     __asm__("j arc_fault");
 }
 #endif
