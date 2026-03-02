@@ -38,6 +38,7 @@ src_semihost += files([
                        '../arc/arc_errno.c',
                        '../arc/arc_exit.c',
                        '../arc/arc_fstat.c',
+                       '../arc/arc_gettimeofday.c',
                        '../arc/arc_lseek.c',
                        '../arc/arc_open.c',
                        '../arc/arc_read.c',
