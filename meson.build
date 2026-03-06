@@ -1945,6 +1945,6 @@ if not enable_multilib and meson.is_subproject()
   picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c])
 endif
 
-if host_cpu_family == 'arc'
-  subdir('platforms/arc')
+if host_cpu_family in ['arc', 'arc64']
+  subdir('platforms' / host_cpu_family)
 endif

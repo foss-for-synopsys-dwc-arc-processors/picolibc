@@ -174,6 +174,37 @@ if host_cpu_family == 'riscv'
   picocrt_variants += arcv_picocrt_variants
 endif
 
+if host_cpu_family in ['arc', 'arc64']
+  arc_picocrt_variants = [
+    {
+      'name': 'hl',
+      'suffix': '-hl',
+      'c_args':  ['-DCRT0_EXIT', '-DCRT0_GET_CMDLINE'],
+      'src': src_picocrt,
+    },
+    {
+      'name': 'hl-trap',
+      'suffix': '-hl-trap',
+      'c_args':  ['-DCRT0_EXIT', '-DCRT0_GET_CMDLINE', '-DCRT0_SEMIHOST_TRAP'],
+      'src': src_picocrt,
+    },
+    {
+      'name': 'noflash-hl',
+      'suffix': '-noflash-hl',
+      'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_GET_CMDLINE'],
+      'src': src_picocrt,
+    },
+    {
+      'name': 'noflash-hl-trap',
+      'suffix': '-noflash-hl-trap',
+      'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_GET_CMDLINE', '-DCRT0_SEMIHOST_TRAP'],
+      'src': src_picocrt,
+    },
+  ]
+
+  picocrt_variants += arc_picocrt_variants
+endif
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']

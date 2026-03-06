@@ -34,75 +34,30 @@
 #
 
 src_hl = files([
-                'hl_api.c',
-                'hl_close.c',
-                'hl_exit.c',
-                'hl_fstat.c',
-                'hl_get_cmdline.c',
-                'hl_gettimeofday.c',
-                'hl_gw.c',
-                'hl_isatty.c',
-                'hl_kill.c',
-                'hl_lseek.c',
-                'hl_open.c',
-                'hl_read.c',
-                'hl_times.c',
-                'hl_unlink.c',
-                'hl_write.c',
+                '../arc/hl_api.c',
+                '../arc/hl_close.c',
+                '../arc/hl_exit.c',
+                '../arc/hl_get_cmdline.c',
+                '../arc/hl_gettimeofday.c',
+                '../arc/hl_gw.c',
+                '../arc/hl_isatty.c',
+                '../arc/hl_kill.c',
+                '../arc/hl_lseek.c',
+                '../arc/hl_open.c',
+                '../arc/hl_read.c',
+                '../arc/hl_times.c',
+                '../arc/hl_unlink.c',
+                '../arc/hl_write.c',
                ])
-
-src_uart_8250 = [
-                 'uart_8250_exit.c',
-                 'uart_8250_kill.c',
-                 'uart_8250_stub.c',
-                 'uart_8250.c',
-                ]
-
-src_hsdk = files(['hsdk.c'] + src_uart_8250)
-src_emsdp = files(['emsdp.c'] + src_uart_8250)
 
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  src_platform = []
-
-  is_arcem = '''
-  #ifndef __ARCEM__
-  #error __ARCEM__ is not defined
-  #endif
-  '''
-
-  if cc.compiles(is_arcem, args: target_c_args + c_args)
-    platform_name = 'emsdp'
-    src_platform = src_emsdp
-  endif
-
-  is_archs = '''
-  #ifndef __ARCHS__
-  #error __ARCHS__ is not defined
-  #endif
-  '''
-
-  if cc.compiles(is_archs, args: target_c_args + c_args)
-    platform_name = 'hsdk'
-    src_platform = src_hsdk
-  endif
-
-  if src_platform == []
-    continue
-  endif
 
   instdir = join_paths(lib_dir, target_dir)
 
   if meson.version().version_compare('>=1.10')
-    _lib = static_library(platform_name,
-                          src_platform,
-                          build_subdir : target_dir,
-                          install : really_install,
-                          install_dir : instdir,
-                          include_directories : inc,
-                          c_args : target_c_args + c_args)
     _lib = static_library('hl',
                           src_hl,
                           build_subdir : target_dir,
@@ -112,23 +67,11 @@ foreach params : targets
                           c_args : target_c_args + c_args)
   else
     target_lib_prefix = params['lib_prefix']
-    _lib = static_library(join_paths(target_dir, target_lib_prefix + platform_name),
-                          src_platform,
-                          install : really_install,
-                          install_dir : instdir,
-                          include_directories : inc,
-                          c_args : target_c_args + c_args)
     _lib = static_library(join_paths(target_dir, target_lib_prefix + 'hl'),
                           src_hl,
                           install : really_install,
                           install_dir : instdir,
                           include_directories : inc,
                           c_args : target_c_args + c_args)
-  endif
-endforeach
-
-foreach specs_file : ['hsdk.specs', 'emsdp1.1.specs', 'emsdp1.2.specs']
-  if specs_install and really_install
-    install_data(specs_file, install_dir: specs_dir)
   endif
 endforeach
