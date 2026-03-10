@@ -1,6 +1,6 @@
 [binaries]
-c = ['arc-snps-elf-gcc', '-nostdlib', '-mno-sdata', '-fno-delayed-branch']
-cpp = ['arc-snps-elf-g++', '-nostdlib', '-mno-sdata', '-fno-delayed-branch']
+c = ['arc-snps-elf-gcc', '-nostdlib', '-fno-delayed-branch']
+cpp = ['arc-snps-elf-g++', '-nostdlib', '-fno-delayed-branch']
 ar = 'arc-snps-elf-ar'
 as = 'arc-snps-elf-as'
 nm = 'arc-snps-elf-nm'
