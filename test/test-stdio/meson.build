@@ -78,6 +78,7 @@ if tests_enable_posix_io
     'test-fgetc',
     'test-fgets-eof',
     'test-fopen',
+    'test-fputc',
     'test-fread-fwrite',
     'test-mktemp',
     'test-setvbuf',
