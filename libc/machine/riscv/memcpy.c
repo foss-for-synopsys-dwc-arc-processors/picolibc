@@ -71,12 +71,16 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
     }
 
     /*
-     * If misaligned access is slow or prohibited, and the alignments of the source
-     * and destination are different, we align the destination to do XLEN stores.
-     * This uses only one aligned store for every four (or eight for XLEN == 64)
-     * bytes of data.
+     * If the source and destination have different alignments, we must
+     * use the bytewise/xlen-load path even when __riscv_misaligned_fast
+     * is set, because:
+     *   1. Casting a misaligned unsigned char* to uintxlen_t* and
+     *      dereferencing is undefined behavior in C.
+     *   2. __riscv_misaligned_fast only guarantees scalar misaligned
+     *      support. The compiler may auto-vectorize the word-copy loop,
+     *      producing vle/vse instructions that trap with
+     *      LoadAddressMisaligned on cores without +unaligned-vector-mem.
      */
-#ifndef __riscv_misaligned_fast
     if (unlikely((((uintptr_t)a & msk) != ((uintptr_t)b & msk)))) {
         size_t dst_pad = (uintptr_t)a & msk;
         dst_pad = (SZREG - dst_pad) & msk;
@@ -84,21 +88,35 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
         a += dst_pad;
         b += dst_pad;
 
-        uintxlen_t          *la = (uintxlen_t *)a;
+        uintxlen_t *la = (uintxlen_t *)a;
+        uintxlen_t *lend = (uintxlen_t *)((uintptr_t)end & ~msk);
+
+#ifdef __riscv_misaligned_fast
+        /*
+         * Scalar misaligned access is fast:
+         * we can dereference through uintxlen_t* directly
+         */
+        const uintxlen_t *lb = (const uintxlen_t *)b;
+
+        while (la < lend)
+            *la++ = *lb++;
+
+        b = (const unsigned char *)lb;
+#else
         const unsigned char *cb = (const unsigned char *)b;
-        uintxlen_t          *lend = (uintxlen_t *)((uintptr_t)end & ~msk);
 
         while (la < lend) {
             *la++ = __libc_load_xlen(cb);
             cb += SZREG;
         }
-        a = (unsigned char *)la;
+
         b = (const unsigned char *)cb;
+#endif
+        a = (unsigned char *)la;
         if (unlikely(a < end))
             __libc_memcpy_bytewise(a, b, end - a);
         return aa;
     }
-#endif
 
     if (unlikely(((uintptr_t)a & msk) != 0)) {
         size_t pad = SZREG - ((uintptr_t)a & msk);
