@@ -39,6 +39,7 @@ src_hl = files([
                 'hl_exit.c',
                 'hl_fstat.c',
                 'hl_get_cmdline.c',
+                'hl_getentropy.c',
                 'hl_gettimeofday.c',
                 'hl_gw.c',
                 'hl_isatty.c',
