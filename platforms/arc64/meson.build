@@ -37,6 +37,7 @@ src_hl = files([
                 '../arc/hl_api.c',
                 '../arc/hl_close.c',
                 '../arc/hl_exit.c',
+                '../arc/hl_fstat.c',
                 '../arc/hl_get_cmdline.c',
                 '../arc/hl_gettimeofday.c',
                 '../arc/hl_gw.c',

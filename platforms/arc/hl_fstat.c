@@ -70,7 +70,7 @@ fstat(int fd, struct stat *statbuf)
      * through inargs.
      */
     host_errno = _user_hostlink(HL_GNUIO_EXT_VENDOR_ID, HL_GNUIO_EXT_FSTAT, "iii", (uint32_t)fd,
-                                (uint32_t)&hl_statbuf, (uint32_t)&ret);
+                                (uint32_t) ((uintptr_t) &hl_statbuf), (uint32_t) ((uintptr_t) &ret));
 
     _hl_delete();
 
