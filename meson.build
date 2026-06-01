@@ -1948,3 +1948,5 @@ endif
 if host_cpu_family in ['arc', 'arc64']
   subdir('platforms' / host_cpu_family)
 endif
+
+subdir('dummyhost')
