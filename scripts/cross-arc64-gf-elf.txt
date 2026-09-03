@@ -1,15 +1,15 @@
 [binaries]
-c = ['arc64-snps-elf-gcc', '-nostdlib']
-cpp = ['arc64-snps-elf-g++', '-nostdlib']
-ar = 'arc64-snps-elf-ar'
-as = 'arc64-snps-elf-as'
-nm = 'arc64-snps-elf-nm'
-strip = 'arc64-snps-elf-strip'
+c = ['arc64-gf-elf-gcc', '-nostdlib']
+cpp = ['arc64-gf-elf-g++', '-nostdlib']
+ar = 'arc64-gf-elf-ar'
+as = 'arc64-gf-elf-as'
+nm = 'arc64-gf-elf-nm'
+strip = 'arc64-gf-elf-strip'
 # only needed to run tests
 exe_wrapper = ['env', 'run-arc']
 
 [host_machine]
-system = 'snps'
+system = 'gf'
 cpu_family = 'arc64'
 cpu = 'arc64'
 endian = 'little'
