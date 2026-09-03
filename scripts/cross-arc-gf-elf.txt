@@ -1,17 +1,17 @@
 [binaries]
-c = ['arc64-snps-elf-gcc', '-nostdlib']
-cpp = ['arc64-snps-elf-g++', '-nostdlib']
-ar = 'arc64-snps-elf-ar'
-as = 'arc64-snps-elf-as'
-nm = 'arc64-snps-elf-nm'
-strip = 'arc64-snps-elf-strip'
+c = ['arc-gf-elf-gcc', '-nostdlib', '-fno-delayed-branch']
+cpp = ['arc-gf-elf-g++', '-nostdlib', '-fno-delayed-branch']
+ar = 'arc-gf-elf-ar'
+as = 'arc-gf-elf-as'
+nm = 'arc-gf-elf-nm'
+strip = 'arc-gf-elf-strip'
 # only needed to run tests
 exe_wrapper = ['env', 'run-arc']
 
 [host_machine]
-system = 'snps'
-cpu_family = 'arc64'
-cpu = 'arc64'
+system = 'gf'
+cpu_family = 'arc'
+cpu = 'arc'
 endian = 'little'
 
 [properties]
